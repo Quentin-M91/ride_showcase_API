@@ -1,0 +1,46 @@
+INSERT INTO utilisateurs (nom, prenom, username, email, role, "hashedPassword", "createdAt", "updatedAt") 
+VALUES 
+('Dupont', 'Jean', 'jdupont', 'jdupont@example.com', 'Admin', 'hashedpassword123', NOW(), NOW()),
+('Martin', 'Claire', 'cmartin', 'cmartin@example.com', 'Utilisateur', 'hashedpassword456', NOW(), NOW()),
+('Lemoine', 'Paul', 'plemoine', 'plemoine@example.com', 'Utilisateur', 'hashedpassword789', NOW(), NOW()),
+('Robert', 'Sophie', 'srobert', 'srobert@example.com', 'Admin', 'hashedpassword012', NOW(), NOW()),
+('Durand', 'Pierre', 'pdurand', 'pdurand@example.com', 'Utilisateur', 'hashedpassword345', NOW(), NOW()),
+('Benoit', 'Lise', 'lbenoit', 'lbenoit@example.com', 'Utilisateur', 'hashedpassword678', NOW(), NOW()),
+('Fournier', 'Marc', 'mfournier', 'mfournier@example.com', 'Admin', 'hashedpassword901', NOW(), NOW()),
+('Moreau', 'Isabelle', 'imoreau', 'imoreau@example.com', 'Utilisateur', 'hashedpassword234', NOW(), NOW()),
+('Gauthier', 'Nicolas', 'ngauthier', 'ngauthier@example.com', 'Admin', 'hashedpassword567', NOW(), NOW()),
+('Pires', 'Laura', 'lpires', 'lpires@example.com', 'Utilisateur', 'hashedpassword890', NOW(), NOW()),
+('Lemoine', 'Victor', 'vlemoine', 'vlemoine@example.com', 'Utilisateur', 'hashedpassword123', NOW(), NOW()),
+('Giraud', 'Alice', 'agiraud', 'agiraud@example.com', 'Utilisateur', 'hashedpassword456', NOW(), NOW()),
+('Dupuis', 'Sébastien', 'sdupuis', 'sdupuis@example.com', 'Admin', 'hashedpassword789', NOW(), NOW()),
+('Schmidt', 'Eva', 'eschmidt', 'eschmidt@example.com', 'Utilisateur', 'hashedpassword012', NOW(), NOW()),
+('Roche', 'Claude', 'croche', 'croche@example.com', 'Utilisateur', 'hashedpassword345', NOW(), NOW()),
+('Langlois', 'Catherine', 'clanglois', 'clanglois@example.com', 'Admin', 'hashedpassword678', NOW(), NOW()),
+('Meyer', 'Bernard', 'bmeyer', 'bmeyer@example.com', 'Utilisateur', 'hashedpassword901', NOW(), NOW()),
+('Lemoine', 'Marc', 'mlemoine', 'mlemoine@example.com', 'Utilisateur', 'hashedpassword234', NOW(), NOW()),
+('Chavez', 'René', 'rchavez', 'rchavez@example.com', 'Utilisateur', 'hashedpassword567', NOW(), NOW()),
+('Bourgeois', 'Charlotte', 'cbourgeois', 'cbourgeois@example.com', 'Admin', 'hashedpassword890', NOW(), NOW());
+
+
+
+INSERT INTO "Vehicules" (marque, modele, annee, type_de_vehicule, couleur, type_de_moteur, puissance, transmission, modification_du_vehicule) VALUES
+('Tesla', 'Model 3', '2023', 'Berline', 'Noir', 'Électrique', 283, 'Automatique', 'Aucune'),
+('BMW', 'X5', '2022', 'SUV', 'Blanc', 'Essence', 340, 'Automatique', 'Vitres teintées'),
+('Audi', 'A4', '2021', 'Berline', 'Gris', 'Diesel', 190, 'Manuelle', 'Jantes 19"'),
+('Mercedes', 'CLA', '2023', 'Coupé', 'Rouge', 'Hybride', 218, 'Automatique', 'Reprogrammation moteur'),
+('Peugeot', '208', '2020', 'Citadine', 'Bleu', 'Essence', 110, 'Manuelle', 'Spoiler arrière'),
+('Volkswagen', 'Golf GTI', '2022', 'Compacte', 'Noir', 'Essence', 245, 'Automatique', 'Échappement sport'),
+('Renault', 'Clio', '2019', 'Citadine', 'Jaune', 'Diesel', 100, 'Manuelle', 'Aucune'),
+('Ford', 'Mustang', '2021', 'Coupé', 'Bleu', 'Essence', 450, 'Automatique', 'Turbo ajouté'),
+('Nissan', 'GT-R', '2023', 'Sportive', 'Gris', 'Essence', 600, 'Automatique', 'Bodykit aérodynamique'),
+('Porsche', '911 Turbo', '2022', 'Coupé', 'Rouge', 'Essence', 650, 'Automatique', 'Aileron carbone'),
+('Ferrari', 'F8 Tributo', '2023', 'Sportive', 'Rouge', 'Essence', 720, 'Automatique', 'Reprogrammation Stage 2'),
+('Lamborghini', 'Huracán', '2021', 'Sportive', 'Vert', 'Essence', 640, 'Automatique', 'Échappement Akrapovic'),
+('Maserati', 'Ghibli', '2020', 'Berline', 'Noir', 'Essence', 430, 'Automatique', 'Vitres teintées'),
+('Alfa Romeo', 'Giulia', '2022', 'Berline', 'Blanc', 'Essence', 280, 'Automatique', 'Kit carrosserie'),
+('Aston Martin', 'Vantage', '2023', 'Coupé', 'Gris', 'Essence', 510, 'Automatique', 'Échappement sport'),
+('Bugatti', 'Chiron', '2022', 'Hypercar', 'Bleu', 'Essence', 1500, 'Automatique', 'Aucune'),
+('Chevrolet', 'Camaro', '2021', 'Coupé', 'Orange', 'Essence', 455, 'Manuelle', 'Superchargeur'),
+('Dodge', 'Challenger', '2023', 'Muscle Car', 'Noir', 'Essence', 717, 'Automatique', 'Ligne d’échappement modifiée'),
+('McLaren', '720S', '2022', 'Sportive', 'Orange', 'Essence', 720, 'Automatique', 'Aileron surélevé'),
+('Rolls-Royce', 'Ghost', '2021', 'Berline', 'Blanc', 'Essence', 563, 'Automatique', 'Intérieur personnalisé');
