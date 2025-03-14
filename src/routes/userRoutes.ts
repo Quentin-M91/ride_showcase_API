@@ -1,5 +1,5 @@
 import express from "express";
-import { register, deleteUser, getAllUsers, modifyUser, searchUsers, login } from "../controllers/userController";
+import { register, deleteUser, getAllUsers, modifyUser, searchUsers, login, getQRCode } from "../controllers/userController";
 import { isAdmin } from "../middlewares/verifyAdminMiddleware";
 import { verifyTokenMiddleware } from "../middlewares/verifyTokenMiddleware";
 
@@ -295,6 +295,8 @@ router.put("/:id", isAdmin, modifyUser);
  */
 router.delete('/:id', isAdmin, deleteUser);
 
+router.get("/qrcode/:userId", getQRCode);
+
 /**
  * @swagger
  * /users/searchUsers:
@@ -342,5 +344,6 @@ router.delete('/:id', isAdmin, deleteUser);
  *         description: Erreur serveur
  */
 router.get('/searchUsers', searchUsers);
+
 
 export default router;

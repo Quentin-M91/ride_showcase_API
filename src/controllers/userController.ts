@@ -5,6 +5,8 @@ import { hashPassword, verifyPassword } from '../utils/pwdUtils';
 import { generateToken } from '../utils/JWTUtils';
 import { validateSchema } from '../utils/joiUtils';
 import { loginSchema } from "../JoiValidators/authValidators";
+import QRCode from "qrcode";
+import QRCodeModel from "../models/QRCode.model";
 
 export async function getAllUsers(req: Request, res: Response) {
     try {
@@ -24,24 +26,41 @@ export async function register(req: Request, res: Response) {
             return
         }
 
-        //hashage
+        // Hashage du MDP
         const hashedPassword = await hashPassword(password);
 
+        // Création de l'utilisateur
         const utilisateur = await Utilisateur.create({ nom, prenom, username, email, hashedPassword });
+        console.log(utilisateur);
 
-        // // Création du garage pour cet utilisateur
-        // const garage = await Garage.create({ utilisateur_id: utilisateur.id });
+        // Génération de l'URL du profil
+        const profileUrl = `http://localhost:4200/profile/${utilisateur.id}`;
 
-        //on supprime le hashed password
+        // Génération du QR Code
+        const qrCodeData = await QRCode.toDataURL(profileUrl);
+        console.log(qrCodeData);
+
+        // Enregistrement du QR Code dans la base de données
+        const qrCode = await QRCodeModel.create({
+            Code: qrCodeData,
+            UtilisateurID: utilisateur.id,
+        });
+
+        // Supprimer le hashed password
         utilisateur.hashedPassword = '';
 
-        res.json(utilisateur);
-        // res.status(201).json({ message: "Utilisateur créé avec succès", utilisateur, garage });
+        // Envoyer la réponse avec le QR Code
+        res.status(201).json({
+            message: "Utilisateur créé avec succès",
+            utilisateur,
+            qrCode: qrCode.Code = '', // QR Code sous forme de base64
+        });
+
     } catch (err: any) {
         //erreur de duplication 
-        if (err.code === 11000) {
+        if (err.code === "SequelizeUniqueConstraintError") {
             res.status(400).json({ message: 'Cet email ou username est déjà utilisé' });
-            return
+            return;
         }
         // Gestion des erreurs
         res.status(500).json({ message: 'Erreur interne', error: err.message });
@@ -128,6 +147,33 @@ export async function deleteUser(req: Request, res: Response) {
     }
 }
 
+export async function getQRCode(req: Request, res: Response) {
+    try {
+        const { userId } = req.params;
+
+        // Vérifier si l'utilisateur existe
+        const utilisateur = await Utilisateur.findByPk(userId);
+        if (!utilisateur) {
+            res.status(404).json({ message: "Utilisateur non trouvé" });
+            return;
+        }
+
+        // Récupérer le QR Code
+        const qrCode = await QRCodeModel.findOne({ where: { UtilisateurID: userId } });
+        if (!qrCode) {
+            res.status(404).json({ message: "QR Code non trouvé" });
+            return;
+        }
+
+        // Envoyer le QR Code
+        res.status(200).json({ qrCode: qrCode.Code });
+
+    } catch (error: any) {
+        res.status(500).json({ message: "Erreur interne", error: error.message });
+        return;
+    }
+}
+
 /**
 * Effectue une recherche avancée sur les utilisateurs.
 * Filtrage par nom, email et date de création avec une requête SQL optimisée.
@@ -163,41 +209,3 @@ ORDER BY nom ASC;
         res.status(500).json({ message: error.message });
     }
 }
-
-
-
-
-
-// export async function register(req: Request, res: Response) {
-//     try {
-//         // Validation des champs
-//         const { nom, prenom, username, email, password } = req.body;
-//         if (!nom || !prenom || !email || !password) {
-//             res.status(400).send('Champs manquant: nom, prenom, username, email ou mot de passe');
-//             return
-//         }
-
-//         //hashage
-//         const hashedPassword = await hashPassword(password);
-
-//         const utilisateur = await Utilisateur.create({ nom, prenom, username, email, hashedPassword });
-
-//         // Création du garage pour cet utilisateur
-//         const garage = await Garage.create({ utilisateur_id: utilisateur.id, vehicule_id: null }); // vehicule_id is now nullable
-
-//         //on supprime le hashed password
-//         utilisateur.hashedPassword = '';
-
-//         // res.json(utilisateur);
-//         res.status(201).json({ message: "Utilisateur créé avec succès", utilisateur, garage });
-//     } catch (err: any) {
-//         //erreur de duplication 
-//         if (err.code === 11000) {
-//             res.status(400).json({ message: 'Cet email ou username est déjà utilisé' });
-//             return
-//         }
-//         // Gestion des erreurs
-//         res.status(500).json({ message: 'Erreur interne', error: err.message });
-
-//     }
-// }

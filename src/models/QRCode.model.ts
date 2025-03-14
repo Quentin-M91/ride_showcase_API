@@ -26,7 +26,7 @@ QRCode.init(
             primaryKey: true,
         },
         Code: {
-            type: DataTypes.STRING,
+            type: DataTypes.TEXT,
             allowNull: false,
             unique: true,
         },
