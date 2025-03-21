@@ -1,7 +1,8 @@
 import express from "express";
-import { getAllVehicule, createVehicule, updateVehicule, deleteVehicule } from "../controllers/vehiculeController";
+import { getAllVehicule, createVehicule, updateVehicule, deleteVehicule, uploadVehiculeImage } from "../controllers/vehiculeController";
 import { isAdmin } from "../middlewares/verifyAdminMiddleware";
 import { verifyTokenMiddleware } from "../middlewares/verifyTokenMiddleware";
+import upload from "../middlewares/multerMiddlewares";
 
 const router = express.Router();
 
@@ -220,5 +221,7 @@ router.put("/modification/:id", verifyTokenMiddleware, updateVehicule);
  *         description: Erreur serveur.
  */
 router.delete("/suppression/:id",verifyTokenMiddleware,deleteVehicule);
+
+router.post("/vehicules/:vehiculeId/upload", upload.single("file"), uploadVehiculeImage);
 
 export default router;

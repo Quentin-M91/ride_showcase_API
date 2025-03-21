@@ -7,6 +7,7 @@ import { validateSchema } from '../utils/joiUtils';
 import { loginSchema } from "../JoiValidators/authValidators";
 import QRCode from "qrcode";
 import QRCodeModel from "../models/QRCode.model";
+import crypto from 'crypto';
 
 export async function getAllUsers(req: Request, res: Response) {
     try {
@@ -33,18 +34,39 @@ export async function register(req: Request, res: Response) {
         const utilisateur = await Utilisateur.create({ nom, prenom, username, email, hashedPassword });
         console.log(utilisateur);
 
+        const secretKey = "1234567890123456"; // 16 caractères pour AES-128
+        const iv = Buffer.alloc(16, 0); // IV de 16 octets (zeros)
+
+        function encrypt(text: string): string {
+            const cipher = crypto.createCipheriv("aes-128-cbc", Buffer.from(secretKey), iv);
+            let encrypted = cipher.update(text, "utf8", "base64");
+            encrypted += cipher.final("base64");
+            return encrypted;
+        }
+
         // Génération de l'URL du profil
         const profileUrl = `http://localhost:4200/profile/${utilisateur.id}`;
 
+        // 🔐 Chiffrement de l'URL
+        const encryptedProfileUrl = encrypt(profileUrl);
+
         // Génération du QR Code
-        const qrCodeData = await QRCode.toDataURL(profileUrl);
-        console.log(qrCodeData);
+        const qrCodeData = await QRCode.toDataURL(encryptedProfileUrl);
+        console.log(encryptedProfileUrl);
 
         // Enregistrement du QR Code dans la base de données
         const qrCode = await QRCodeModel.create({
             Code: qrCodeData,
             UtilisateurID: utilisateur.id,
         });
+
+        // Fonction de déchiffrement
+        function decrypt(encryptedText: string): string {
+            const decipher = crypto.createDecipheriv("aes-128-cbc", Buffer.from(secretKey), iv);
+            let decrypted = decipher.update(encryptedText, "base64", "utf8");
+            decrypted += decipher.final("utf8");
+            return decrypted;
+        }
 
         // Supprimer le hashed password
         utilisateur.hashedPassword = '';
@@ -94,7 +116,7 @@ export async function login(req: Request, res: Response) {
         }
 
         const token = generateToken({ id: utilisateur.id, nom: utilisateur.nom, role: utilisateur.role });
-        res.cookie("jwt", token, {httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production"});
+        res.cookie("jwt", token, { httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production" });
         res.status(200).json({ message: 'Connexion réussie' });
 
     } catch (error: any) {

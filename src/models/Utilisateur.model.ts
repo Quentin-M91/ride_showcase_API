@@ -86,7 +86,6 @@ Utilisateur.init(
     }
 );
 
-// Vehicule.hasOne(Utilisateur, { foreignKey: "vehicules_id" });
-// Utilisateur.belongsTo(Vehicule, { foreignKey: "vehicules_id" });
+
 
 export default Utilisateur;

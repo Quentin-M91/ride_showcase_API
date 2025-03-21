@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import Vehicule from "../models/Vehicule.model";
+import { v2 as cloudinary } from "cloudinary";
 
 export async function getAllVehicule(req: Request, res: Response) {
     try {
@@ -11,7 +12,6 @@ export async function getAllVehicule(req: Request, res: Response) {
 
     }
 }
-
 
 export async function createVehicule(req: Request, res: Response): Promise<void> {
     try {
@@ -88,6 +88,46 @@ export async function deleteVehicule(req: Request, res: Response) {
         res.status(500).json({ message: "Erreur serveur" });
     }
 }
+
+export const uploadVehiculeImage = async (req: Request, res: Response): Promise<void> => {
+    try {
+        if (!req.file) {
+            res.status(400).json({ error: "Aucune image envoyée" });
+            return;
+        }
+
+        // Upload sur Cloudinary
+        const result = await new Promise((resolve, reject) => {
+            const stream = cloudinary.uploader.upload_stream({ folder: "vehicules" }, (error, result) => {
+                if (error) reject(error);
+                resolve(result);
+            });
+            if (req.file) {
+                stream.end(req.file.buffer);
+            } else {
+                throw new Error("La mémoire tampon du fichier est indéfinie");
+            }
+        });
+
+        const imageUrl = (result as any).secure_url;
+
+        // Mise à jour du véhicule avec l'image
+        const vehiculeId = req.params.vehiculeId;
+        const vehicule = await Vehicule.findByPk(vehiculeId);
+
+        if (!vehicule) {
+            res.status(404).json({ error: "Véhicule non trouvé" });
+            return;
+        }
+
+        vehicule.imageURL = imageUrl;
+        await vehicule.save();
+
+        res.status(200).json({ message: "Image uploadée avec succès", imageUrl });
+    } catch (error) {
+        res.status(500).json({ error: "Erreur lors de l'upload" });
+    }
+};
 
 // export async function searchVehicule(req: Request, res: Response) {
 //     try {
