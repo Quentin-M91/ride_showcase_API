@@ -1,5 +1,5 @@
 import express from "express";
-import { register, deleteUser, getAllUsers, modifyUser, searchUsers, login, getQRCode } from "../controllers/userController";
+import { register, deleteUser, getAllUsers, modifyUser, searchUsers, login, getQRCode, getUserInfo } from "../controllers/userController";
 import { isAdmin } from "../middlewares/verifyAdminMiddleware";
 import { verifyTokenMiddleware } from "../middlewares/verifyTokenMiddleware";
 
@@ -296,6 +296,8 @@ router.put("/:id", isAdmin, modifyUser);
 router.delete('/:id', isAdmin, deleteUser);
 
 router.get("/qrcode/:userId", getQRCode);
+
+router.get("/usersInfo", verifyTokenMiddleware, getUserInfo);
 
 /**
  * @swagger

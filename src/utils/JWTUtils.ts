@@ -14,10 +14,21 @@ export function verifyToken(token: string): string | JwtPayload | null {
         throw new Error("JWT_SECRET non présente dans les variables d'environnement");
     }
     try {
-
         return jwt.verify(token, SECRET_KEY);
-
     } catch {
+        return null;
+    }
+}
+
+export function getUserIdFromPayload(payloadJson: string): string | null {
+    try {
+        if (!payloadJson || typeof payloadJson !== 'string')
+            return null;
+
+        const payload = JSON.parse(payloadJson);
+        return payload.id || null;
+    } catch (error) {
+        console.error('Erreur lors du parsing du payload JWT :', error);
         return null;
     }
 }

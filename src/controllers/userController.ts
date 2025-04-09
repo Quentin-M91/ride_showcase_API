@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import Utilisateur from "../models/Utilisateur.model";
 import sequelize from "../config/database";
 import { hashPassword, verifyPassword } from '../utils/pwdUtils';
-import { generateToken } from '../utils/JWTUtils';
+import { generateToken, getUserIdFromPayload } from '../utils/JWTUtils';
 import { validateSchema } from '../utils/joiUtils';
 import { loginSchema } from "../JoiValidators/authValidators";
 import QRCode from "qrcode";
@@ -92,16 +92,22 @@ export async function register(req: Request, res: Response) {
 
 
 export async function login(req: Request, res: Response) {
-    const { username, email, password } = validateSchema(req, loginSchema);
     try {
+        
+        const {email, password } = validateSchema(req, loginSchema);
 
-        if (!email && !username) {
-            res.status(400).json({ message: "Email ou username requis" });
+        // Vérification de l'utilisateur
+        const utilisateur = await Utilisateur.findOne({ where: email ? { email } : {} });
+
+        if (!email) {
+            res.status(400).json({ message: "Email requis" });
             return;
         }
 
-        const whereClause = username ? { username } : { email };
-        const utilisateur = await Utilisateur.findOne({ where: whereClause });
+        if (!password) {
+            res.status(400).json({ message: "Mot de passe requis" });
+            return;
+        }
 
         if (!utilisateur) {
             res.status(404).json({ message: 'Utilisateur non trouvé' });
@@ -117,7 +123,7 @@ export async function login(req: Request, res: Response) {
 
         const token = generateToken({ id: utilisateur.id, nom: utilisateur.nom, role: utilisateur.role });
         res.cookie("jwt", token, { httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production" });
-        res.status(200).json({ message: 'Connexion réussie' });
+        res.status(200).json({ message: 'Connexion réussie', token});
 
     } catch (error: any) {
         res.status(500).json({ message: error.message });
@@ -195,6 +201,23 @@ export async function getQRCode(req: Request, res: Response) {
         return;
     }
 }
+
+
+export async function getUserInfo(req: Request, res: Response) {
+    //Récupère l'information de l'utilisateur quand il se connecte
+    const user = getUserIdFromPayload(req.headers.payload as string);
+    if (!user) {
+        res.status(404).json({ message: "Utilisateur introuvable" });
+        return
+    }
+    try {
+        const utilisateurs = await Utilisateur.findByPk(user);
+        res.send(utilisateurs);
+    } catch (error: any) {
+        res.status(500).json({ error: error.message });
+    }
+}
+
 
 /**
 * Effectue une recherche avancée sur les utilisateurs.
