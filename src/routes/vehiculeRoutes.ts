@@ -1,5 +1,5 @@
 import express from "express";
-import { getAllVehicule, createVehicule, updateVehicule, deleteVehicule, uploadVehiculeImage } from "../controllers/vehiculeController";
+import { getAllVehicule, createVehicule, updateVehicule, deleteVehicule, uploadVehiculeImages, getVehiculesByUser, deleteVehiculeImage } from "../controllers/vehiculeController";
 import { isAdmin } from "../middlewares/verifyAdminMiddleware";
 import { verifyTokenMiddleware } from "../middlewares/verifyTokenMiddleware";
 import upload from "../middlewares/multerMiddlewares";
@@ -222,6 +222,10 @@ router.put("/modification/:id", verifyTokenMiddleware, updateVehicule);
  */
 router.delete("/suppression/:id",verifyTokenMiddleware,deleteVehicule);
 
-router.post("/vehicules/:vehiculeId/upload", upload.single("file"), uploadVehiculeImage);
+router.post("/:vehiculeId/images", uploadVehiculeImages);
+
+router.delete("/images/:id",verifyTokenMiddleware, deleteVehiculeImage);
+
+router.get('/user',verifyTokenMiddleware, getVehiculesByUser);
 
 export default router;

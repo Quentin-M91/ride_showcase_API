@@ -7,7 +7,7 @@ import vehiculeRoutes from './routes/vehiculeRoutes';
 import swaggerUi from "swagger-ui-express";
 import swaggerDocs from './config/swagger';
 import { v2 as cloudinary } from 'cloudinary';
-import cors from 'cors'
+import cors from 'cors';
 
 //Création d'un serveur Express
 const app = express();
@@ -26,37 +26,6 @@ testConnection().then(() => syncDatabase());
         api_key: '934429782157822',
         api_secret: 'JwBMn9nZaBEqu2qdp9XazlQxeZc' // Click 'View API Keys' above to copy your API secret
     });
-
-    // Upload an image
-    const uploadResult = await cloudinary.uploader
-        .upload(
-            'https://res.cloudinary.com/demo/image/upload/getting-started/shoes.jpg', {
-            public_id: 'shoes',
-        }
-        )
-        .catch((error) => {
-            console.log(error);
-        });
-
-    console.log(uploadResult);
-
-    // Optimize delivery by resizing and applying auto-format and auto-quality
-    const optimizeUrl = cloudinary.url('shoes', {
-        fetch_format: 'auto',
-        quality: 'auto'
-    });
-
-    console.log(optimizeUrl);
-
-    // Transform the image: auto-crop to square aspect_ratio
-    const autoCropUrl = cloudinary.url('shoes', {
-        crop: 'auto',
-        gravity: 'auto',
-        width: 500,
-        height: 500,
-    });
-
-    console.log(autoCropUrl);
 })();
 
 // Activer CORS uniquement pour une seule origine
@@ -75,12 +44,12 @@ const PORT = 3000;
 console.log("lancement du serveur")
 
 //Config du serveur par défaut
-app.use(express.json());
+app.use(express.json({ limit: '25mb' }));
+app.use(express.urlencoded({ extended: true, limit: '25mb' }));
 
 //Ajouter les routes ici
 app.use('/users', userRoutes)
 app.use('/vehicule', vehiculeRoutes)
-
 
 // Swagger route
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));

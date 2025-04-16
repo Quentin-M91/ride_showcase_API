@@ -295,9 +295,10 @@ router.put("/:id", isAdmin, modifyUser);
  */
 router.delete('/:id', isAdmin, deleteUser);
 
-router.get("/qrcode/:userId", getQRCode);
-
 router.get("/usersInfo", verifyTokenMiddleware, getUserInfo);
+
+router.get("/getQRCode/:userId", getQRCode);
+
 
 /**
  * @swagger

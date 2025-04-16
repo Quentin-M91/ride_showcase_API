@@ -2,12 +2,13 @@ import { Request, Response } from "express";
 import Utilisateur from "../models/Utilisateur.model";
 import sequelize from "../config/database";
 import { hashPassword, verifyPassword } from '../utils/pwdUtils';
-import { generateToken, getUserIdFromPayload } from '../utils/JWTUtils';
+import { generateToken } from '../utils/JWTUtils';
 import { validateSchema } from '../utils/joiUtils';
 import { loginSchema } from "../JoiValidators/authValidators";
 import QRCode from "qrcode";
 import QRCodeModel from "../models/QRCode.model";
 import crypto from 'crypto';
+import { AuthenticatedRequest } from "../middlewares/verifyTokenMiddleware";
 
 export async function getAllUsers(req: Request, res: Response) {
     try {
@@ -75,7 +76,7 @@ export async function register(req: Request, res: Response) {
         res.status(201).json({
             message: "Utilisateur créé avec succès",
             utilisateur,
-            qrCode: qrCode.Code = '', // QR Code sous forme de base64
+            qrCode: qrCode.Code, // QR Code sous forme de base64
         });
 
     } catch (err: any) {
@@ -202,17 +203,25 @@ export async function getQRCode(req: Request, res: Response) {
     }
 }
 
+export async function getUserInfo(req: AuthenticatedRequest, res: Response) {
 
-export async function getUserInfo(req: Request, res: Response) {
     //Récupère l'information de l'utilisateur quand il se connecte
-    const user = getUserIdFromPayload(req.headers.payload as string);
-    if (!user) {
+    const userId = req.user?.id;
+    
+    if (!userId) {
         res.status(404).json({ message: "Utilisateur introuvable" });
         return
     }
+
     try {
-        const utilisateurs = await Utilisateur.findByPk(user);
-        res.send(utilisateurs);
+        const utilisateur = await Utilisateur.findByPk(userId);
+        if (!utilisateur) {
+            res.status(404).json({ message: "Utilisateur introuvable en base" });
+            return
+        }
+        
+        res.send(utilisateur);
+
     } catch (error: any) {
         res.status(500).json({ error: error.message });
     }

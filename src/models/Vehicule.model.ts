@@ -15,7 +15,6 @@ interface VehiculeAttributes {
     transmission: string;
     modification_du_vehicule: string;
     Utilisateur_id: number;
-    imageURL?: string;
 }
 
 class Vehicule extends Model<VehiculeAttributes> implements VehiculeAttributes {
@@ -30,7 +29,6 @@ class Vehicule extends Model<VehiculeAttributes> implements VehiculeAttributes {
     public transmission!: string;
     public modification_du_vehicule!: string;
     public Utilisateur_id!: number; // Clé étrangère
-    public imageURL!: string; // URL de l'image du véhicule    
 }
 
 Vehicule.init(
@@ -87,10 +85,6 @@ Vehicule.init(
                 key: 'id'
             },
         },
-        imageURL: {
-            type: DataTypes.STRING,
-            allowNull: true
-        }, // URL de l'image du véhicule
     },
     {
         sequelize,

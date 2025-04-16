@@ -8,7 +8,7 @@ dotenv.config();
 const SECRET_KEY = process.env.JWT_KEY;
 
 export interface AuthenticatedRequest extends Request {
-    user?: any; // On ajoute `user` à `req`
+    user?: jwt.JwtPayload; // On ajoute `user` à `req`
 }
 
 export function verifyTokenMiddleware(req: AuthenticatedRequest, res: Response, next: NextFunction): void {
@@ -20,7 +20,7 @@ export function verifyTokenMiddleware(req: AuthenticatedRequest, res: Response, 
         let token: string | undefined;
 
         // Check Authorization header (Bearer token)
-        if (req.headers.authorization && req.headers.authorization.startsWith("Bearer ")) {
+        if (req.headers.authorization?.startsWith("Bearer ")) {
             token = req.headers.authorization.split(" ")[1];
         }
 
@@ -47,7 +47,7 @@ export function verifyTokenMiddleware(req: AuthenticatedRequest, res: Response, 
         }
 
         // Attach user payload to request for later use
-        req.headers.payload = JSON.stringify(decoded);
+        req.user= decoded;
         next();
 
     } catch (error: any) {

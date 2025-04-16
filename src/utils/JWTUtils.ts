@@ -19,16 +19,3 @@ export function verifyToken(token: string): string | JwtPayload | null {
         return null;
     }
 }
-
-export function getUserIdFromPayload(payloadJson: string): string | null {
-    try {
-        if (!payloadJson || typeof payloadJson !== 'string')
-            return null;
-
-        const payload = JSON.parse(payloadJson);
-        return payload.id || null;
-    } catch (error) {
-        console.error('Erreur lors du parsing du payload JWT :', error);
-        return null;
-    }
-}
