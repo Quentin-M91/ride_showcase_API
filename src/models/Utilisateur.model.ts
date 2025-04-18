@@ -12,6 +12,7 @@ interface UtilisateurAttributes {
     role?: 'Admin' | 'Utilisateur';
     hashedPassword: string;
     garage?: number[];
+    public_view_token: string;
     createdAt?: Date;
     updatedAt?: Date;
 }
@@ -26,6 +27,7 @@ class Utilisateur extends Model<UtilisateurAttributes>
     public role!: 'Admin' | 'Utilisateur';
     public hashedPassword!: string;
     public garage!: number[];
+    public public_view_token!: string;
     public readonly createdAt!: Date;
     public readonly updatedAt!: Date;
 }
@@ -77,6 +79,11 @@ Utilisateur.init(
                 model: 'vehicules', // Nom de la table utilisateur
                 key: 'id'
             },
+        },
+        public_view_token: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            unique: true,
         },
     },
     {

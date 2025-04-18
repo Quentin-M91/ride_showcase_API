@@ -1,5 +1,5 @@
 import express from "express";
-import { register, deleteUser, getAllUsers, modifyUser, searchUsers, login, getQRCode, getUserInfo } from "../controllers/userController";
+import { register, deleteUser, getAllUsers, modifyUser, searchUsers, login, getQRCode, getUserInfo, getProfilPublic } from "../controllers/userController";
 import { isAdmin } from "../middlewares/verifyAdminMiddleware";
 import { verifyTokenMiddleware } from "../middlewares/verifyTokenMiddleware";
 
@@ -298,6 +298,8 @@ router.delete('/:id', isAdmin, deleteUser);
 router.get("/usersInfo", verifyTokenMiddleware, getUserInfo);
 
 router.get("/getQRCode/:userId", getQRCode);
+
+router.get("/profil-public", getProfilPublic);
 
 
 /**

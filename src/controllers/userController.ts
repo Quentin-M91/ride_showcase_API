@@ -7,7 +7,7 @@ import { validateSchema } from '../utils/joiUtils';
 import { loginSchema } from "../JoiValidators/authValidators";
 import QRCode from "qrcode";
 import QRCodeModel from "../models/QRCode.model";
-import crypto from 'crypto';
+import { randomBytes } from 'crypto';
 import { AuthenticatedRequest } from "../middlewares/verifyTokenMiddleware";
 
 export async function getAllUsers(req: Request, res: Response) {
@@ -31,43 +31,25 @@ export async function register(req: Request, res: Response) {
         // Hashage du MDP
         const hashedPassword = await hashPassword(password);
 
+        // Token pour la vue publique
+        const viewToken = randomBytes(24).toString('hex');
+
         // Création de l'utilisateur
-        const utilisateur = await Utilisateur.create({ nom, prenom, username, email, hashedPassword });
+        const utilisateur = await Utilisateur.create({ nom, prenom, username, email, hashedPassword, public_view_token: viewToken });
         console.log(utilisateur);
 
-        const secretKey = "1234567890123456"; // 16 caractères pour AES-128
-        const iv = Buffer.alloc(16, 0); // IV de 16 octets (zeros)
-
-        function encrypt(text: string): string {
-            const cipher = crypto.createCipheriv("aes-128-cbc", Buffer.from(secretKey), iv);
-            let encrypted = cipher.update(text, "utf8", "base64");
-            encrypted += cipher.final("base64");
-            return encrypted;
-        }
-
         // Génération de l'URL du profil
-        const profileUrl = `http://localhost:4200/profile/${utilisateur.id}`;
-
-        // 🔐 Chiffrement de l'URL
-        const encryptedProfileUrl = encrypt(profileUrl);
+        const publicProfileUrl = `http://localhost:4200/profil-public?token=${viewToken}`;
 
         // Génération du QR Code
-        const qrCodeData = await QRCode.toDataURL(encryptedProfileUrl);
-        console.log(encryptedProfileUrl);
+        const qrCodeData = await QRCode.toDataURL(publicProfileUrl);
+        console.log(publicProfileUrl);
 
         // Enregistrement du QR Code dans la base de données
         const qrCode = await QRCodeModel.create({
             Code: qrCodeData,
             UtilisateurID: utilisateur.id,
         });
-
-        // Fonction de déchiffrement
-        function decrypt(encryptedText: string): string {
-            const decipher = crypto.createDecipheriv("aes-128-cbc", Buffer.from(secretKey), iv);
-            let decrypted = decipher.update(encryptedText, "base64", "utf8");
-            decrypted += decipher.final("utf8");
-            return decrypted;
-        }
 
         // Supprimer le hashed password
         utilisateur.hashedPassword = '';
@@ -224,6 +206,31 @@ export async function getUserInfo(req: AuthenticatedRequest, res: Response) {
 
     } catch (error: any) {
         res.status(500).json({ error: error.message });
+    }
+}
+
+export async function getProfilPublic(req: Request, res: Response) {
+    try {
+        const { token } = req.query;
+        if (!token || typeof token !== 'string') {
+            res.status(400).json({ message: "Token manquant" });
+            return
+        }
+
+        const utilisateur = await Utilisateur.findOne({
+            where: { public_view_token: token },
+            attributes: ['id', 'nom', 'prenom', 'email', 'username'] // champs publics
+        });
+
+        if (!utilisateur) {
+            res.status(404).json({ message: "Profil introuvable" });
+            return
+        }
+
+        res.status(200).json({ utilisateur });
+
+    } catch (error: any) {
+        res.status(500).json({ message: "Erreur serveur", error: error.message });
     }
 }
 
