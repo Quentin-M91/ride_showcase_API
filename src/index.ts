@@ -4,10 +4,12 @@ import { testConnection } from './config/database';
 import { syncDatabase } from './models/syncModels';
 import userRoutes from './routes/userRoutes';
 import vehiculeRoutes from './routes/vehiculeRoutes';
+import actuRoutes from './routes/actuRoutes';
 import swaggerUi from "swagger-ui-express";
 import swaggerDocs from './config/swagger';
 import { v2 as cloudinary } from 'cloudinary';
 import cors from 'cors';
+
 
 //Création d'un serveur Express
 const app = express();
@@ -50,6 +52,7 @@ app.use(express.urlencoded({ extended: true, limit: '25mb' }));
 //Ajouter les routes ici
 app.use('/users', userRoutes)
 app.use('/vehicule', vehiculeRoutes)
+app.use('/actu', actuRoutes)
 
 // Swagger route
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
