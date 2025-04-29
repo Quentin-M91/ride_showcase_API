@@ -1,6 +1,7 @@
 import { DataTypes, Model } from 'sequelize';
 import sequelize from '../config/database';
 import Utilisateur from './Utilisateur.model';
+import Like from './Like.model';
 
 class Post extends Model {
     public id!: number;
@@ -11,18 +12,38 @@ class Post extends Model {
     public UtilisateurID!: number;
 }
 
-Post.init({
-    id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-    content: { type: DataTypes.TEXT, allowNull: false },
-    imageUrl: { type: DataTypes.STRING, allowNull: true },
-    UtilisateurID: { type: DataTypes.INTEGER, allowNull: false }
-}, {
-    sequelize,
-    tableName: 'posts',
-    timestamps: true
-});
+Post.init(
+    {
+        id: {
+            type: DataTypes.INTEGER,
+            autoIncrement: true,
+            primaryKey: true
+        },
+        content: {
+            type: DataTypes.TEXT,
+            allowNull: false
+        },
+        imageUrl: {
+            type: DataTypes.STRING,
+            allowNull: true
+        },
+        UtilisateurID: {
+            type: DataTypes.INTEGER,
+            allowNull: false
+        }
+    },
+    {
+        sequelize,
+        tableName: 'posts',
+        timestamps: true
+    }
+);
 
 Utilisateur.hasMany(Post, { foreignKey: 'UtilisateurID' });
 Post.belongsTo(Utilisateur, { foreignKey: 'UtilisateurID' });
+
+// 🔥 AJOUT : Association avec "Like" et alias "Likers"
+Utilisateur.belongsToMany(Post, { through: Like, foreignKey: 'UtilisateurID' });
+Post.belongsToMany(Utilisateur, { through: Like, as: 'Likers', foreignKey: 'PostID' });
 
 export default Post;
